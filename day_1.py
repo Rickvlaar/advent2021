@@ -13,6 +13,7 @@ test_input = [199,
               263]
 
 
+@util.get_runtime
 def count_increases(measurements: list[int], window_size: int = 1) -> int:
     no_o_increases = 0
     for index in range((window_size - 1), len(measurements)):
