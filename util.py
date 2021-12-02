@@ -12,9 +12,9 @@ def convert_str_list_to_int_list(str_list: list[str]) -> list[int]:
 
 def get_runtime(function):
     def wrapper(*args, **kwargs):
-        start = time.time_ns()
+        start = time.perf_counter_ns()
         result = function(*args, **kwargs)
-        end = time.time_ns()
+        end = time.perf_counter_ns()
         print(f'[bold blue]{function.__name__}[/bold blue]', '[red]ran for[/red]', (end-start)/1e6, '[red]ms[/red]')
         return result
     return wrapper

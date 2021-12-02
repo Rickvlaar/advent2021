@@ -1,3 +1,4 @@
+from rich import print
 import util
 
 day_1_input = util.parse_file_as_list('input/day_1.txt')
@@ -26,5 +27,5 @@ def count_increases(measurements: list[int], window_size: int = 1) -> int:
 
 if __name__ == '__main__':
     day_1_input = util.convert_str_list_to_int_list(day_1_input)
-    print(count_increases(day_1_input))  # Day 1A
-    print(count_increases(day_1_input, 3))  # Day 1B
+    print(f'solution 1A: {count_increases(day_1_input)}')
+    print(f'solution 1B: {count_increases(day_1_input, 3)}')
