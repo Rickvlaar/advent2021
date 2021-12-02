@@ -18,6 +18,7 @@ class Submarine:
         self.directions = directions
         self.manual_version = manual_version
 
+    @util.get_runtime
     def process_directions(self):
         for direction, val in self.directions:
             self.get_direction_handler(direction)(val)
@@ -55,10 +56,13 @@ def split_command_and_value(list_str: list[str]) -> list[list[str, int]]:
     return [[a, int(b)] for a, b in [line.split(' ') for line in list_str]]
 
 
-@util.get_runtime
-def get_solutions():
-    command_value_list = split_command_and_value(day_2_directions)
+# moved this out so I can properly measure runtime
+def prepare_input(filename):
+    return split_command_and_value(filename)
 
+
+@util.get_runtime
+def get_solutions(command_value_list):
     sub_a = Submarine(directions=command_value_list, manual_version='a')
     sub_b = Submarine(directions=command_value_list, manual_version='b')
 
@@ -70,4 +74,5 @@ def get_solutions():
 
 
 if __name__ == '__main__':
-    get_solutions()
+    get_solutions(prepare_input(test_directions))
+    get_solutions(prepare_input(day_2_directions))
