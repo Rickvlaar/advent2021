@@ -42,12 +42,9 @@ def filter_array(report: List[str], filter_func: Callable) -> int:
     transposed_array = reshape_array(report)
 
     for bit_index in range(len(transposed_array)):
-        lines_kept = []
         line = transposed_array[bit_index]
         wanted_val = filter_func(line)
-        for index, val in enumerate(line):
-            if val == wanted_val:
-                lines_kept.append(input_report[index])
+        lines_kept = [input_report[index] for index, val in enumerate(line) if val == wanted_val]
         transposed_array = reshape_array(lines_kept)
         input_report = lines_kept
         if len(lines_kept) == 1:
