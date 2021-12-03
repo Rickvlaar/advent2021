@@ -1,4 +1,3 @@
-from rich import print
 import util
 
 day_2_directions = util.parse_file_as_list('input/day_2.txt')
@@ -11,14 +10,13 @@ test_directions = ['forward 5',
 
 
 class Submarine:
-    def __init__(self, directions: list[list[str, int]], manual_version: str):
+    def __init__(self, directions: list[tuple[str, int]], manual_version: str):
         self.depth = 0
         self.horizontal_pos = 0
         self.aim = 0
         self.directions = directions
         self.manual_version = manual_version
 
-    @util.get_runtime
     def process_directions(self):
         for direction, val in self.directions:
             self.get_direction_handler(direction)(val)
@@ -52,8 +50,8 @@ class Submarine:
         self.aim -= val
 
 
-def split_command_and_value(list_str: list[str]) -> list[list[str, int]]:
-    return [[a, int(b)] for a, b in [line.split(' ') for line in list_str]]
+def split_command_and_value(list_str: list[str]) -> list[tuple[str, int]]:
+    return [(a, int(b)) for a, b in [line.split(' ') for line in list_str]]
 
 
 @util.get_runtime
@@ -66,10 +64,15 @@ def get_solutions(filename):
     sub_a.process_directions()
     sub_b.process_directions()
 
-    print(f'solution 2A: {sub_a.depth * sub_a.horizontal_pos}')
-    print(f'solution 2B: {sub_b.depth * sub_b.horizontal_pos}')
+    return sub_a, sub_b
 
 
 if __name__ == '__main__':
-    get_solutions(test_directions)
-    get_solutions(day_2_directions)
+    test_sub_a, test_sub_b = get_solutions(test_directions)
+    util.console.print(f'solution 2A: {test_sub_a.depth * test_sub_a.horizontal_pos}')
+    util.console.print(f'solution 2B: {test_sub_b.depth * test_sub_b.horizontal_pos}')
+
+    day_2_sub_a, day_2_sub_b = get_solutions(day_2_directions)
+    util.console.print(f'solution 2A: {day_2_sub_a.depth * day_2_sub_a.horizontal_pos}')
+    util.console.print(f'solution 2B: {day_2_sub_b.depth * day_2_sub_b.horizontal_pos}')
+
