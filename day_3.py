@@ -18,13 +18,13 @@ test_input = ['00100',
               '01010']
 
 
-def reshape_array(report: List[any]):
+def reshape_array(report: List[any]) -> np.ndarray:
     reshaped = [list(line) for line in report]
     return np.transpose(reshaped)
 
 
 @util.get_runtime
-def get_power_rate(transposed_array) -> int:
+def get_power_rate(transposed_array: np.ndarray) -> int:
     gamma_rate = ''.join([get_most_common_bit(line) for line in transposed_array])
     epsilon_rate = ''.join([get_least_common_bit(line) for line in transposed_array])
     return int(gamma_rate, 2) * int(epsilon_rate, 2)
@@ -53,11 +53,11 @@ def filter_array(report: List[str], filter_func: Callable) -> int:
     return int(''.join(input_report[0]), 2)
 
 
-def get_most_common_bit(line: List[str]):
+def get_most_common_bit(line: List[str]) -> str:
     return '1' if sum(np.char.count(line, '1')) >= len(line) / 2 else '0'
 
 
-def get_least_common_bit(line: List[str]):
+def get_least_common_bit(line: List[str]) -> str:
     return '0' if sum(np.char.count(line, '1')) >= len(line) / 2 else '1'
 
 
