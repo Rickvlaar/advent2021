@@ -1,3 +1,4 @@
+from collections import Counter
 import numpy as np
 from typing import List, Callable
 import util
@@ -25,8 +26,18 @@ def reshape_array(report: List[any]) -> np.ndarray:
 
 @util.get_runtime
 def get_power_rate(transposed_array: np.ndarray) -> int:
-    gamma_rate = ''.join([get_most_common_bit(line) for line in transposed_array])
-    epsilon_rate = ''.join([get_least_common_bit(line) for line in transposed_array])
+    # gamma_rate = ''.join([get_most_common_bit(line) for line in transposed_array])
+    # epsilon_rate = ''.join([get_least_common_bit(line) for line in transposed_array])
+    # print(Counter(transposed_array[0]).most_common()[0][0])
+
+    # gamma_rate = ''.join([Counter(line).most_common()[0][0] for line in transposed_array])
+    # epsilon_rate = ''.join([Counter(line).most_common()[1][0] for line in transposed_array])
+    gamma_rate = ''
+    epsilon_rate = ''
+    for line in transposed_array:
+        counter = Counter(line).most_common()
+        gamma_rate += get_most_common_bit(counter)
+        epsilon_rate += get_least_common_bit(counter)
     return int(gamma_rate, 2) * int(epsilon_rate, 2)
 
 
@@ -43,7 +54,8 @@ def filter_array(report: List[str], filter_func: Callable) -> int:
 
     for bit_index in range(len(transposed_array)):
         line = transposed_array[bit_index]
-        wanted_val = filter_func(line)
+        counter = Counter(line).most_common()
+        wanted_val = filter_func(counter)
         lines_kept = [input_report[index] for index, val in enumerate(line) if val == wanted_val]
         transposed_array = reshape_array(lines_kept)
         input_report = lines_kept
@@ -53,12 +65,12 @@ def filter_array(report: List[str], filter_func: Callable) -> int:
     return int(''.join(input_report[0]), 2)
 
 
-def get_most_common_bit(line: List[str]) -> str:
-    return '1' if sum(np.char.count(line, '1')) >= len(line) / 2 else '0'
+def get_most_common_bit(counter) -> str:
+    return counter[0][0]
 
 
-def get_least_common_bit(line: List[str]) -> str:
-    return '0' if sum(np.char.count(line, '1')) >= len(line) / 2 else '1'
+def get_least_common_bit(counter) -> str:
+    return counter[-1][0]
 
 
 if __name__ == '__main__':
