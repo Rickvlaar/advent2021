@@ -14,7 +14,7 @@ class Bingo:
         self.bingo_cards: list[BingoCard] = list()
         self.winner_count: int = 0
 
-    def setup_bingo_from_file(self, file: list[str]):
+    def setup_bingo_from_file(self, file: list[str]) -> None:
         self.draw_order = [int(num) for num in file[0].split(',')]
 
         numbers = list()
@@ -27,62 +27,31 @@ class Bingo:
         self.bingo_cards.append(BingoCard().create_card_from_list(input_matrix=numbers))
 
     @get_runtime
-    def play_2(self):
+    def play(self, play_till_end: bool = False) -> int:
         for num in self.draw_order:
-            console.print(num)
             self.drawn_numbers.append(num)
             for card in self.bingo_cards:
                 if not card.bingo:
                     card.new_num_draw(num)
                     if card.bingo:
-                        numbersum = sum(card.card_numbers.difference(self.drawn_numbers))
-                        console.print(f'Unmarked number sum: {numbersum}')
-                        console.print(f'Last number: {num}')
-                        console.print(f'Solution 4A: {num}')
                         self.winner_count += 1
-                        if self.winner_count == len(self.bingo_cards):
-                            return
+                        if not play_till_end or len(self.bingo_cards) == self.winner_count:
+                            return self.get_score(num, card)
 
-
-    # @get_runtime
-    # def play(self):
-    #     # Start with first 5 numbers, because bingo needs 5
-    #     self.drawn_numbers.extend(self.draw_order[:5])
-    #     self.all_possible_bingos = set(permutations(self.drawn_numbers))
-    #
-    #     for num in self.draw_order[4:]:
-    #         console.print(num)
-    #         self.drawn_numbers.append(num)
-    #         self.all_possible_bingos = set(permutations(self.drawn_numbers, 5))
-    #         if self.we_have_a_winner():
-    #             console.print(f'Last number: {num}')
-    #             console.print(f'Solution 4A: {num}')
-    #             self.winner_count += 1
-    #             if self.winner_count == len(self.bingo_cards):
-    #                 return
-    #
-    # def we_have_a_winner(self):
-    #     for card in self.bingo_cards:
-    #         if not card.bingo:
-    #             if not card.bingo_numbers.isdisjoint(self.all_possible_bingos):
-    #                 card.bingo = True
-    #                 self.winner_count += 1
-    #                 the_winner = card.bingo_numbers.intersection(self.all_possible_bingos)
-    #                 # console.print(f'The winner is: {the_winner}')
-    #                 numbersum = sum(card.card_numbers.difference(self.drawn_numbers))
-    #                 console.print(f'Unmarked number sum: {numbersum}')
-    #                 return the_winner
+    def get_score(self, num, card) -> int:
+        unmarked_no_sum = sum(card.card_numbers.difference(self.drawn_numbers))
+        final_score = num * unmarked_no_sum
+        return final_score
 
 
 class BingoCard:
 
     def __init__(self):
-        self.bingo_numbers: set[tuple[int]] = set()
         self.number_dict: dict[int: BingoCard.Number] = dict()
         self.card_numbers: set[int] = set()
         self.bingo: bool = False
 
-    def create_card_from_list(self, input_matrix: list[list[int]]):
+    def create_card_from_list(self, input_matrix: list[list[int]]) -> 'BingoCard':
         numbers_matrix = np.array(input_matrix)
         transposed_matrix = numbers_matrix.transpose()
 
@@ -96,13 +65,12 @@ class BingoCard:
 
         return self
 
-    def new_num_draw(self, num: int):
+    def new_num_draw(self, num: int) -> None:
         if num in self.number_dict:
             card_number = self.number_dict.get(num)
             card_number.drawn = True
             if self.is_bingo(card_number):
                 self.bingo = True
-                console.print('BINGO!')
 
     def is_bingo(self, card_number) -> bool:
         for number_set in card_number.inline_number_sets:
@@ -118,6 +86,13 @@ class BingoCard:
 
 # only straight lines will win
 if __name__ == '__main__':
-    bingo = Bingo()
-    bingo.setup_bingo_from_file(day_4_file)
-    bingo.play_2()
+    bingo_a = Bingo()
+    bingo_a.setup_bingo_from_file(day_4_file)
+    a = bingo_a.play()
+
+    bingo_b = Bingo()
+    bingo_b.setup_bingo_from_file(day_4_file)
+    b = bingo_b.play(True)
+
+    console.print(f'solution 4A: {a}')
+    console.print(f'solution 4B: {b}')
