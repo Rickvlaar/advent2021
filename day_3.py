@@ -81,17 +81,17 @@ def get_least_common_bit(bits: int, limit: int) -> int:
 
 
 if __name__ == '__main__':
-    # test_half_bit_length = int(len(test_input) / 2)
-    # test_array = report_to_bin_array(test_input)
-    # test_power_rate = get_power_rate(test_array, test_half_bit_length)
-    # test_life_support_rate = get_life_support_rate(test_input)
-    # util.console.print(f'test solution 3A: {test_power_rate}')
-    # util.console.print(f'test solution 3B: {test_life_support_rate}\n')
+    test_half_bit_length = int(len(test_input) / 2)
+    test_array = report_to_bin_array(test_input)
+    test_power_rate = get_power_rate(test_array, test_half_bit_length)
+    test_shaped = reshape_array(test_input)
+    test_life_support_rate = get_life_support_rate(test_shaped)
+    util.console.print(f'test solution 3A: {test_power_rate}')
+    util.console.print(f'test solution 3B: {test_life_support_rate}\n')
 
     day3_half_bit_length = int(len(day_3_diagnostics) / 2)
     reshaped_array = report_to_bin_array(day_3_diagnostics)
     power_rate = get_power_rate(reshaped_array, day3_half_bit_length)
-
     shaped = reshape_array(day_3_diagnostics)
     life_support_rate = get_life_support_rate(shaped)
     util.console.print(f'solution 3A: {power_rate}')

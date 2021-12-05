@@ -1,5 +1,4 @@
 from util import console, parse_file_as_list, get_runtime
-from itertools import permutations
 import numpy as np
 
 day_4_file = parse_file_as_list('input/day_4.txt')
@@ -26,7 +25,6 @@ class Bingo:
                 numbers = []
         self.bingo_cards.append(BingoCard().create_card_from_list(input_matrix=numbers))
 
-    @get_runtime
     def play(self, play_till_end: bool = False) -> int:
         for num in self.draw_order:
             self.drawn_numbers.append(num)
@@ -84,15 +82,22 @@ class BingoCard:
             self.inline_number_sets: list[set] = [number_set]
 
 
-# only straight lines will win
-if __name__ == '__main__':
+@get_runtime
+def run_a():
     bingo_a = Bingo()
     bingo_a.setup_bingo_from_file(day_4_file)
-    a = bingo_a.play()
+    return bingo_a.play()
 
+
+@get_runtime
+def run_b():
     bingo_b = Bingo()
     bingo_b.setup_bingo_from_file(day_4_file)
-    b = bingo_b.play(True)
+    return bingo_b.play(True)
 
+# only straight lines will win
+if __name__ == '__main__':
+    a = run_a()
+    b = run_b()
     console.print(f'solution 4A: {a}')
     console.print(f'solution 4B: {b}')
