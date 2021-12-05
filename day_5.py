@@ -55,22 +55,19 @@ def fill_diagonal(vent_map, coord_a, coord_b):
     y_min = min(coord_a[1], coord_b[1])
     y_max = max(coord_a[1], coord_b[1]) + 1
 
-    x_traversal = [x for x in range(x_min, x_max)]
-    y_traversal = [y for y in range(y_min, y_max)]
+    x_traversal = np.arange(x_min, x_max)
+    y_traversal = np.arange(y_min, y_max)
 
     if coord_a[0] > coord_b[0]:
-        x_traversal.reverse()
+        x_traversal = np.flip(x_traversal)
     if coord_a[1] > coord_b[1]:
-        y_traversal.reverse()
+        y_traversal = np.flip(y_traversal)
 
-    coords_to_update = zip(x_traversal, y_traversal)
-    for coord in coords_to_update:
-        vent_map[coord[1], coord[0]] += 1
+    vent_map[y_traversal, x_traversal] += 1
 
 
 def count_dangerous_coords(vent_map: np.array):
-    filtered = np.where(vent_map > 1)
-    return filtered[0].size
+    return vent_map[vent_map > 1].size
 
 
 @get_runtime
