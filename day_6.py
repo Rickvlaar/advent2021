@@ -1,3 +1,4 @@
+from collections import defaultdict
 from util import console, parse_file_as_list, get_runtime
 import numpy as np
 
@@ -10,8 +11,7 @@ def parse_list(file):
 
 
 def parse_file_as_dict(file):
-    # prefill dict to prevent problems
-    fish_dic = {fish_age: 0 for fish_age in range(9)}
+    fish_dic = defaultdict(int)
     for char in file[0].split(','):
         fish_dic[int(char)] += 1
     return fish_dic
