@@ -40,8 +40,8 @@ def time_function(iterations: int, function: Callable, *args, **kwargs):
                   (end - start) / 1e6,
                   '[red]ms[/red]')
 
-    # Averge runtime
+    # Average runtime
     console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                  f'[red]average runtime for {iterations} iterations[/red]'
-                  , (end - start) / 1e6 / iterations,
+                  f'[red]average runtime for {iterations} iterations[/red]',
+                  (end - start) / 1e6 / iterations,
                   '[red]ms[/red]')
