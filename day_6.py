@@ -11,13 +11,14 @@ def parse_list(file):
 
 def parse_file_as_dict(file):
     # prefill dict to prevent problems
-    fish_dic = {fish_age: 0 for fish_age in reversed(range(9))}
+    fish_dic = {fish_age: 0 for fish_age in range(9)}
     for char in file[0].split(','):
         fish_dic[int(char)] += 1
     return fish_dic
 
 
 # integers are immutable!
+@get_runtime
 def reproduce_fish(school: list[int], days: int) -> int:
     for _ in range(days):
         new_fish = []
@@ -31,10 +32,11 @@ def reproduce_fish(school: list[int], days: int) -> int:
     return len(school)
 
 
+@get_runtime
 def smart_reproduce_fish(school: dict[int, int], days: int) -> int:
     for _ in range(days):
         # move all the counts up day
-        new_school = {fish_age: 0 for fish_age in reversed(range(9))}
+        new_school = {fish_age: 0 for fish_age in range(9)}
         for fish_age, count in school.items():
             if fish_age == 0:
                 new_school[8] += count
