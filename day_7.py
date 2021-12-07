@@ -18,11 +18,8 @@ def calc_crab_fuel_consumption_a(crabby_posses: list[int]):
 
 @get_runtime
 def calc_crab_fuel_consumption_b(crabby_posses: list[int]):
-    most_efficient = round(statistics.mean(crabby_posses))
+    most_efficient = sum(crabby_posses) // len(crabby_posses)
     fuel = 0
-    # x = lambda a : a * b
-    # fuel2 = map(x, crabby_posses)
-
     for pos in crabby_posses:
         diff = abs(pos - most_efficient)
         fuel += (diff * (diff + 1)) / 2
@@ -30,11 +27,13 @@ def calc_crab_fuel_consumption_b(crabby_posses: list[int]):
 
 
 if __name__ == '__main__':
+    crabby_posse = prepare_file(test_file)
+    test_a = calc_crab_fuel_consumption_a(crabby_posse)
+    test_b = calc_crab_fuel_consumption_b(crabby_posse)
+
     crabby_posses = prepare_file(day_7_file)
     sev_a = calc_crab_fuel_consumption_a(crabby_posses)
     sev_b = calc_crab_fuel_consumption_b(crabby_posses)
 
-# console.print(f'test solution 6A: {test_6a}')
-    # console.print(f'test solution 6B: {test_6b}')
     console.print(f'solution 7A: {sev_a}')
     console.print(f'solution 7B: {sev_b}')
