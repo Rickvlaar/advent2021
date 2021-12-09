@@ -1,5 +1,4 @@
 import statistics
-import math
 from util import console, parse_file_as_list, get_runtime, convert_str_list_to_int_list
 
 day_7_file = parse_file_as_list('input/day_7.txt')
