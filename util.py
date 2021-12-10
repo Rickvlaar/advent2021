@@ -28,20 +28,33 @@ def get_runtime(function: Callable):
 
 
 # Time function runtime for 'n' iterations in ms
-def time_function(iterations: int, function: Callable, *args, **kwargs):
-    start = time.perf_counter_ns()
-    for _ in range(iterations):
-        function(*args, **kwargs)
-    end = time.perf_counter_ns()
+def time_function(iterations: int = 100):
+    def decorator(function: Callable):
+        def wrapper(*args, **kwargs):
+            start = time.perf_counter_ns()
 
-    # Total runtime
-    console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                  f'[red]total runtime for {iterations} iterations[/red]',
-                  (end - start) / 1e6,
-                  '[red]ms[/red]')
+            result = None
+            for _ in range(iterations):
+                result = function(*args, **kwargs)
 
-    # Average runtime
-    console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                  f'[red]average runtime for {iterations} iterations[/red]',
-                  (end - start) / 1e6 / iterations,
-                  '[red]ms[/red]')
+            end = time.perf_counter_ns()
+
+            # Total runtime
+            console.print(f'[bold blue]{function.__name__}[/bold blue]',
+                          f'[red]total runtime for[/red]',
+                          f'{iterations}',
+                          f'[red]iterations[/red]',
+                          (end - start) / 1e6,
+                          '[red]ms[/red]')
+
+            # Average runtime
+            console.print(f'[bold blue]{function.__name__}[/bold blue]',
+                          f'[red]average runtime for[/red]',
+                          f'{iterations}',
+                          f'[red]iterations[/red]',
+                          (end - start) / 1e6 / iterations,
+                          '[red]ms[/red]')
+
+            return result
+        return wrapper
+    return decorator

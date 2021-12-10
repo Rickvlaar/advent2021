@@ -1,4 +1,4 @@
-from util import console, parse_file_as_list, get_runtime, convert_str_list_to_int_list
+from util import console, parse_file_as_list, get_runtime, time_function
 import re
 
 day_file = parse_file_as_list('input/day_10.txt')
@@ -27,7 +27,7 @@ FINISH_DIC = {
 
 
 @get_runtime
-def check_for_corruption_a(file):
+def check_for_corruption_a(file: list[str]) -> int:
     score = 0
     for line in file:
         score += recurse_check(line)
@@ -47,8 +47,9 @@ def recurse_check(line: str) -> int:
     return 0
 
 
-@get_runtime
-def finish_the_lines_b(file):
+# @get_runtime
+@time_function(iterations=1000)
+def finish_the_lines_b(file: list[str]) -> int:
     clean_file = banish_the_corrupted(file)
     scores = []
     for line in clean_file:
@@ -57,7 +58,7 @@ def finish_the_lines_b(file):
     return scores[round(len(scores) / 2)]
 
 
-def banish_the_corrupted(file):
+def banish_the_corrupted(file: list[str]) -> list[str]:
     keep_lines = []
     for index, line in enumerate(file):
         if recurse_check(line) == 0:
