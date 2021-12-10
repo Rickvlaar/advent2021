@@ -396,11 +396,126 @@ def rolf_7b():
             antwoord = antwoord + benzine
 
 
+@get_runtime
+def rolf_8():
+    # bestand lezen en in stukjes hakken:
+    bestand = open('input/day_8.txt', 'r')
+    alles = bestand.readlines()
+    input = []
+    for x in range(len(alles)):
+        alles[x] = alles[x].replace('\n', '')
+    for x in range(len(alles)):
+        alles[x] = alles[x].split(' | ')
+    for x in range(len(alles)):
+        alles[x][0] = alles[x][0].split(' ')
+    for x in range(len(alles)):
+        alles[x][1] = alles[x][1].split(' ')
+
+    # antwoord op vraag A berekenen:
+    legalelengtes = [2, 3, 4, 7]
+    antwoord = 0
+    for x in range(len(alles)):
+        for y in range(4):
+            for z in range(4):
+                if len(alles[x][1][y]) == legalelengtes[z]:
+                    antwoord = antwoord + 1
+    # print(antwoord)
+
+    # letters sorteren:
+    for x in range(len(alles)):
+        for y in range(2):
+            for z in range(len(alles[x][y])):
+                alles[x][y][z] = ''.join(sorted(alles[x][y][z]))
+
+    # de decode code aanmaken:
+    decode = []
+    for x in range(len(alles)):
+        decode.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+    # de 1,4,7,8 er in:
+    for x in range(len(alles)):
+        for y in range(10):
+            if len(alles[x][0][y]) == 2:
+                decode[x][1] = alles[x][0][y]
+            elif len(alles[x][0][y]) == 4:
+                decode[x][4] = alles[x][0][y]
+            elif len(alles[x][0][y]) == 3:
+                decode[x][7] = alles[x][0][y]
+            elif len(alles[x][0][y]) == 7:
+                decode[x][8] = alles[x][0][y]
+
+    # de 069 er in:
+    for x in range(len(alles)):
+        nulzesnegen = []
+        for y in range(10):
+            if len(alles[x][0][y]) == 6:
+                nulzesnegen.append(alles[x][0][y])
+            if len(alles[x][0][y]) == 2:
+                deeen = list(alles[x][0][y])
+        for y in range(3):
+            isditeenzes = False
+            isditeennegen = False
+            isditeennul = False
+            for z in range(2):
+                if deeen[z] not in nulzesnegen[y]:
+                    isditeenzes = True
+            for z in range(4):
+                if decode[x][4][z] not in list(nulzesnegen[y]) and isditeenzes == False:
+                    isditeennul = True
+            if isditeennul == False and isditeenzes == False:
+                isditeennegen = True
+            if isditeenzes:
+                decode[x][6] = nulzesnegen[y]
+            if isditeennul:
+                decode[x][0] = nulzesnegen[y]
+            if isditeennegen:
+                decode[x][9] = nulzesnegen[y]
+
+    # de 235 er in:
+    for x in range(len(alles)):
+        tweedrievijf = []
+        for y in range(10):
+            if len(alles[x][0][y]) == 5:
+                tweedrievijf.append(alles[x][0][y])
+        for y in range(3):
+            isditeentwee = False
+            isditeendrie = False
+            isditeenvijf = True
+            for z in range(5):
+                if tweedrievijf[y][z] not in list(decode[x][6]):
+                    isditeenvijf = False
+            for z in range(2):
+                if decode[x][1][z] not in list(tweedrievijf[y]) and isditeenvijf == False:
+                    isditeentwee = True
+            if isditeentwee == False and isditeenvijf == False:
+                isditeendrie = True
+            if isditeentwee:
+                decode[x][2] = tweedrievijf[y]
+            if isditeendrie:
+                decode[x][3] = tweedrievijf[y]
+            if isditeenvijf:
+                decode[x][5] = tweedrievijf[y]
+
+    # oplossing uitrekenen:
+    antwoord = 0
+
+    for x in range(len(alles)):
+        deze = ''
+        for y in range(4):
+            for z in range(10):
+                if alles[x][1][y] == decode[x][z]:
+                    deze = deze + str(z)
+        antwoord = antwoord + int(deze)
+
+    # print(antwoord)
+
+
 if __name__ == '__main__':
     # rolf_dag_4a()
     # rolf_dag_4b()
     # rolf_5()
     # rolf_6a()
     # rolf_6b()
-    rolf_7a()
-    rolf_7b()
+    # rolf_7a()
+    # rolf_7b()
+    rolf_8()
