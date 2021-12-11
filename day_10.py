@@ -26,7 +26,7 @@ FINISH_DIC = {
 }
 
 
-@get_runtime
+@time_function()
 def check_for_corruption_a(file: list[str]) -> int:
     score = 0
     for line in file:
@@ -47,8 +47,7 @@ def recurse_check(line: str) -> int:
     return 0
 
 
-# @get_runtime
-@time_function(iterations=1000)
+@time_function()
 def finish_the_lines_b(file: list[str]) -> int:
     clean_file = banish_the_corrupted(file)
     scores = []

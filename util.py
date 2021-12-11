@@ -41,7 +41,8 @@ def time_function(iterations: int = 100):
 
             # Total runtime
             console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                          f'[red]total runtime for[/red]',
+                          f'[bright_magenta bold]TOTAL[/bright_magenta bold]',
+                          f'[red]runtime for[/red]',
                           f'{iterations}',
                           f'[red]iterations[/red]',
                           (end - start) / 1e6,
@@ -49,12 +50,15 @@ def time_function(iterations: int = 100):
 
             # Average runtime
             console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                          f'[red]average runtime for[/red]',
+                          f'[bright_magenta bold]AVERAGE[/bright_magenta bold]',
+                          f'[red]runtime for[/red]',
                           f'{iterations}',
                           f'[red]iterations[/red]',
                           (end - start) / 1e6 / iterations,
                           '[red]ms[/red]')
 
             return result
+
         return wrapper
+
     return decorator
