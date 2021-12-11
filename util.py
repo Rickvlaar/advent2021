@@ -28,7 +28,7 @@ def get_runtime(function: Callable):
 
 
 # Time function runtime for 'n' iterations in ms
-def time_function(iterations: int = 100):
+def time_function(iterations: int = 1):
     def decorator(function: Callable):
         def wrapper(*args, **kwargs):
             start = time.perf_counter_ns()
