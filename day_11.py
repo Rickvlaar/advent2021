@@ -6,7 +6,7 @@ day_file = parse_file_as_list('input/day_11.txt')
 test_file = parse_file_as_list('input/day_11_test.txt')
 
 
-@time_function(10)
+@time_function(100)
 def octo_flash_a(file: list[str], iterations: int) -> int:
     octo_grid = np.array([list(line) for line in file], dtype=int)
     the_hood = get_the_hood(octo_grid)
@@ -16,7 +16,7 @@ def octo_flash_a(file: list[str], iterations: int) -> int:
     return flash_count
 
 
-@time_function(10)
+@time_function(100)
 def octo_flash_b(file: list[str]) -> int:
     octo_grid = np.array([list(line) for line in file], dtype=int)
     the_hood = get_the_hood(octo_grid)
@@ -30,8 +30,8 @@ def octo_flash_b(file: list[str]) -> int:
 
 def do_step(octo_grid: np.array, flash_count: int, the_hood):
     octo_grid += 1
-    flashed_octos = set()
 
+    flashed_octos = set()
     while octo_grid.max() > 9:
         for y, octo_line in enumerate(octo_grid):
             for x, octo in enumerate(octo_line):
@@ -48,8 +48,7 @@ def up_the_neighbours(y, x, octo_grid, the_hood):
     for coord in the_hood[(y, x)]:
         if coord == (y, x):
             continue
-        val = octo_grid[coord]
-        if val != 0:
+        if octo_grid[coord]:
             octo_grid[coord] += 1
 
 
@@ -64,8 +63,9 @@ def get_the_hood(octo_grid):
 
 
 if __name__ == '__main__':
+
     elf_a = octo_flash_a(day_file, 100)
     elf_b = octo_flash_b(day_file)
-    # ten_b = finish_the_lines_b(day_file)
+
     console.print(f'solution 11A: {elf_a}')
     console.print(f'solution 11B: {elf_b}')

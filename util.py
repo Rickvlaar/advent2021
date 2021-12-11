@@ -39,15 +39,6 @@ def time_function(iterations: int = 1):
 
             end = time.perf_counter_ns()
 
-            # Total runtime
-            console.print(f'[bold blue]{function.__name__}[/bold blue]',
-                          f'[bright_magenta bold]TOTAL[/bright_magenta bold]',
-                          f'[red]runtime for[/red]',
-                          f'{iterations}',
-                          f'[red]iterations[/red]',
-                          (end - start) / 1e6,
-                          '[red]ms[/red]')
-
             # Average runtime
             console.print(f'[bold blue]{function.__name__}[/bold blue]',
                           f'[bright_magenta bold]AVERAGE[/bright_magenta bold]',
