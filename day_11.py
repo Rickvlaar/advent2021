@@ -28,30 +28,21 @@ def octo_flash_b(file: list[str]) -> int:
 
 def do_step(octo_grid: np.array, flash_count: int):
     octo_grid += 1
-
     flashed_octos = set()
-    while octo_grid.max() > 9:
-        flash = np.vectorize(flash_aha)
-        octo_grid = flash(octo_grid)
 
+    while octo_grid.max() > 9:
         for y, octo_line in enumerate(octo_grid):
             for x, octo in enumerate(octo_line):
-                if octo == 0 and (x, y) not in flashed_octos:
+                if octo > 9 and (y, x) not in flashed_octos:
+                    octo_grid[y, x] = 0
                     flash_count += 1
-                    up_the_neighbours(x, y, octo_grid, flashed_octos)
+                    flashed_octos.add((y, x))
+                    up_the_neighbours(y, x, octo_grid)
 
     return octo_grid, flash_count
 
 
-def flash_aha(octo: int):
-    if octo > 9:
-        return 0
-    else:
-        return octo
-
-
-def up_the_neighbours(x, y, octo_grid, flashed_octos: set[tuple]):
-    flashed_octos.add((x, y))
+def up_the_neighbours(y, x, octo_grid):
     xs = [x_2 for x_2 in range(x - 1, x + 2) if 0 <= x_2 < 10]
     ys = [y_2 for y_2 in range(y - 1, y + 2) if 0 <= y_2 < 10]
     neighbours = product(ys, xs)
