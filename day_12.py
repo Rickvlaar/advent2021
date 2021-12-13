@@ -1,5 +1,4 @@
 from util import console, parse_file_as_list, time_function
-from copy import copy
 
 day_file = parse_file_as_list('input/day_12.txt')
 test_file = parse_file_as_list('input/day_12_test.txt')
@@ -10,7 +9,6 @@ class Cave:
     def __init__(self, name: str):
         self.name: str = name
         self.small: bool = name.islower()
-        self.visited: bool = False
         self.connected_to: set[Cave] = set()
 
     def add_connected_cave(self, cave: 'Cave'):
@@ -28,10 +26,10 @@ def create_cave_map_from_file(file):
 
     for cave_name, connection in routes:
         if connection != 'start':
-            cave_dict[cave_name].add_connected_cave(copy(cave_dict[connection]))
+            cave_dict[cave_name].add_connected_cave(cave_dict[connection])
 
         if cave_name != 'start':
-            cave_dict[connection].add_connected_cave(copy(cave_dict[cave_name]))
+            cave_dict[connection].add_connected_cave(cave_dict[cave_name])
 
     return cave_dict
 
@@ -48,8 +46,13 @@ def go_indian_b(cave_dict: dict):
     return go_cavin(start_cave, 0, set(), True)
 
 
-def go_cavin(cave: Cave, route_count: int, visited_nodes: set, go_twice: bool = False) -> int:
+def go_indian_c(cave_dict):
+    start_cave = cave_dict.get('start')
 
+    console.print(start_cave.go_down(start_cave))
+
+
+def go_cavin(cave: Cave, route_count: int, visited_nodes: set, go_twice: bool = False) -> int:
     if cave.name == 'end':
         route_count += 1
         return route_count
@@ -59,15 +62,15 @@ def go_cavin(cave: Cave, route_count: int, visited_nodes: set, go_twice: bool = 
 
     for conn_cave in cave.connected_to:
         if conn_cave.name not in visited_nodes:
-            route_count = go_cavin(conn_cave, route_count, copy(visited_nodes), go_twice)
+            route_count = go_cavin(conn_cave, route_count, visited_nodes.copy(), go_twice)
         elif go_twice and conn_cave.name in visited_nodes:
-            route_count = go_cavin(conn_cave, route_count, copy(visited_nodes), False)
+            route_count = go_cavin(conn_cave, route_count, visited_nodes.copy(), False)
 
     return route_count
 
 
 if __name__ == '__main__':
-    twelf_a = go_indian_a(create_cave_map_from_file(test_file))
+    twelf_a = go_indian_a(create_cave_map_from_file(day_file))
     twelf_b = go_indian_b(create_cave_map_from_file(day_file))
 
     console.print(f'solution 12A: {twelf_a}')
