@@ -8,7 +8,7 @@ test_file = parse_file_as_list('input/day_13_test.txt')
 def get_coords_and_instructions(file: list[str]):
     file_split = file.index('')
 
-    coords = np.array([np.fromstring(line, sep=',', dtype=int) for line in file[:file_split]])
+    coords = np.array([line.split(',') for line in file[:file_split]], dtype=int)
 
     instructions = []
     for line in file[file_split + 1:]:
