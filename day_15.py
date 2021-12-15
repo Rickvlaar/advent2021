@@ -8,22 +8,12 @@ day_file = parse_file_as_list('input/day_15.txt')
 test_file = parse_file_as_list('input/day_15_test.txt')
 
 
-def run_a(file):
-    danger_map = np.array([list(line) for line in file], dtype=int)
-    the_hood = get_the_hood_straight(danger_map)
-    pathfinder = PathFinder(danger_map, the_hood)
-    pathfinder.start_pathfinding(pathfinder.starting_point, [])
-
-
 class PathFinder:
     def __init__(self, danger_map, hood):
         self.danger_map = danger_map
         self.hood = hood
         self.starting_point = (0, 0)
         self.target = (danger_map.shape[0] - 1, danger_map.shape[1] - 1)
-        self.visited_points = set()
-        self.paths = []
-        self.possible_routes = []
         self.coord_step_dict = {}
         self.last_step = None
 
@@ -32,36 +22,50 @@ class PathFinder:
         danger_level: int
         origin: field(compare=False)
         coord: field(compare=False)
-        # previous: field(compare=False)
 
     def start_pathfinding(self, start_coord, path):
-        self.paths.append(path)
-        self.visited_points.add(start_coord)
         neighbours = self.hood.get(start_coord)  # start neighbours
 
         paths = []
         for neigh in neighbours:
             heapq.heappush(paths, self.Step(self.danger_map[neigh], start_coord, neigh))
 
+        self.dijk_it(paths)
+
+    def dijk_it(self, paths):
         while paths:
             most_close = heapq.heappop(paths)
-            # console.print(most_close)
-            # most_close.previous.add(most_close.coord)
-            self.coord_step_dict[most_close.coord] = most_close
+            if most_close.coord in self.coord_step_dict:
+                continue
 
-            danger_neigh_dict = self.get_neighbours_danger(most_close)
+            self.coord_step_dict[most_close.coord] = most_close
 
             if most_close.coord == self.target:
                 console.print(most_close)
                 self.last_step = most_close
                 return
 
-            for neigh_coord, danger_level in danger_neigh_dict.items():
-                heapq.heappush(paths, self.Step(danger_level + most_close.danger_level, most_close.coord, neigh_coord))
+            for neighbour in self.hood.get(most_close.coord):
+                if neighbour in self.coord_step_dict:
+                    continue
+                danger_level = self.danger_map[neighbour] + most_close.danger_level
+                heapq.heappush(paths, self.Step(danger_level, most_close.coord, neighbour))
 
-    def get_neighbours_danger(self, step):
-        danger_neigh_dict = {neigh: self.danger_map[neigh] for neigh in self.hood.get(step.coord) if neigh not in self.coord_step_dict.keys()}
-        return danger_neigh_dict
+
+def transform_danger_map(danger_map):
+    sub_lists = []
+    for y in range(5):
+        for x in range(5):
+            z = danger_map + y + x
+            f = np.vectorize(lambda x: x - 9 if x > 9 else x)
+            sub_lists.append(f(z))
+
+    final = []
+    for v in range(5):
+        final.append(np.hstack(sub_lists[v*5:v*5+5]))
+
+    final = np.vstack(np.array(final))
+    return final
 
 
 def get_the_hood_straight(grid):
@@ -83,22 +87,28 @@ def get_the_hood_straight(grid):
     return the_hood
 
 
-def get_the_hood_8(grid: np.array):
-    max_y = grid.shape[0]
-    max_x = grid.shape[1]
-    the_hood = dict()
-    for y, line in enumerate(grid):
-        for x, num in enumerate(line):
-            xs = [x_2 for x_2 in range(x - 1, x + 2) if 0 <= x_2 < max_x]
-            ys = [y_2 for y_2 in range(y - 1, y + 2) if 0 <= y_2 < max_y]
-            the_hood[(y, x)] = [coord for coord in product(ys, xs)]
-    return the_hood
+@time_function()
+def run_a(file):
+    danger_map = np.array([list(line) for line in file], dtype=int)
+    the_hood = get_the_hood_straight(danger_map)
+    pathfinder = PathFinder(danger_map, the_hood)
+    pathfinder.start_pathfinding(pathfinder.starting_point, [])
+    return pathfinder.last_step.danger_level
+
+
+@time_function()
+def run_b(file):
+    danger_map = np.array([list(line) for line in file], dtype=int)
+    danger_map = transform_danger_map(danger_map)
+    the_hood = get_the_hood_straight(danger_map)
+    pathfinder = PathFinder(danger_map, the_hood)
+    pathfinder.start_pathfinding(pathfinder.starting_point, [])
+    return pathfinder.last_step.danger_level
 
 
 if __name__ == '__main__':
-    run_a(day_file)
-    answer_a = 'a'
-    console.print(f'solution 14A: {answer_a}')
+    answer_a = run_a(day_file)
+    answer_b = run_b(day_file)
 
-    answer_b = 'a'
-    console.print(f'solution 14B: {answer_b}')
+    console.print(f'solution 15A: {answer_a}')
+    console.print(f'solution 15B: {answer_b}')
