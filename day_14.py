@@ -26,39 +26,48 @@ def insert_polymers(polymer: str, rules: dict[str, str]):
     return new_string
 
 
-def recursive_pair_match(pair: str, rules: dict[str, str], new_chars: list[str], max_iter: int, x: int):
-    if max_iter == x:
-        return
-
+def recursive_pair_match(pair: str, rules: dict[str, str], max_iter: int, x: int):
     new_char = rules.get(pair)
-    new_chars.append(new_char)
-
+    x += 1
+    if max_iter == x:
+        return new_char
     new_pair_1 = pair[0] + new_char
     new_pair_2 = new_char + pair[1]
-
-    x += 1
-
-    recursive_pair_match(new_pair_1, rules, new_chars, max_iter, x)
-    recursive_pair_match(new_pair_2, rules, new_chars, max_iter, x)
-
+    return recursive_pair_match(new_pair_1, rules, max_iter, x) + new_char + recursive_pair_match(new_pair_2, rules, max_iter, x)
 
 
 @time_function()
 def run(n: int):
-    polymer, rules = parse_file(test_file)
-    for _ in range(n):
-        console.print(_)
-        polymer = insert_polymers(polymer, rules)
-        console.print(Counter(polymer).most_common())
-    most_common = Counter(polymer).most_common()
+    polymer, rules = parse_file(day_file)
+
+    new_polymer = polymer[0]
+
+    for y in range(7):
+        new_polymer = polymer[0]
+        for x in range(len(polymer) - 1):
+            new_polymer += recursive_pair_match(polymer[x: x+2], rules, y+1, 0) + polymer[x+1]
+        console.print(Counter(new_polymer).most_common())
+
+    # repeats = recursive_pair_match(polymer[0: 2], rules, n, 0)
+    # y = 1
+    # while 1:
+    #     if repeats[0: y] not in repeats[y:]:
+    #         console.print(repeats)
+    #         console.print('\n\n')
+    #         console.print(repeats[0: y])
+    #
+    #         return
+    #     y += 1
+
+    most_common = Counter(new_polymer).most_common()
     return most_common[0][1] - most_common[-1][1]
 
 
 if __name__ == '__main__':
-    answer_a = run(10)
+    answer_a = run(1)
     console.print(f'solution 14A: {answer_a}')
 
-    answer_b = run(40)
-    console.print(f'solution 14B: {answer_b}')
+    # answer_b = run(40)
+    # console.print(f'solution 14B: {answer_b}')
 
 

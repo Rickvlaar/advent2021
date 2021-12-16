@@ -1,6 +1,5 @@
 from util import console, parse_file_as_list, time_function
 from dataclasses import dataclass, field
-from itertools import product
 import heapq
 import numpy as np
 
@@ -41,7 +40,6 @@ class PathFinder:
             self.coord_step_dict[most_close.coord] = most_close
 
             if most_close.coord == self.target:
-                console.print(most_close)
                 self.last_step = most_close
                 return
 
