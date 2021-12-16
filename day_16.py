@@ -1,25 +1,9 @@
 from util import console, parse_file_as_list, time_function
 from dataclasses import dataclass, field
-import numpy as np
+from math import prod
 
 day_file = parse_file_as_list('input/day_16.txt')
 test_file = parse_file_as_list('input/day_16_test.txt')
-
-
-# The three bits labeled V (110) are the packet version, 6.
-# The three bits labeled T (100) are the packet type ID, 4, which means the packet is a literal value.
-# The five bits labeled A (10111) start with a 1 (not the last group, keep reading) and contain the first four bits of the number, 0111.
-# The five bits labeled B (11110) start with a 1 (not the last group, keep reading) and contain four more bits of the number, 1110.
-# The five bits labeled C (00101) start with a 0 (last group, end of packet) and contain the last four bits of the number, 0101.
-# The three unlabeled 0 bits at the end are extra due to the hexadecimal representation and should be ignored.
-
-# T4
-# 3   3   5     5     5
-# VVV TTT AAAAA BBBBB CCCCC
-
-# T1 & T6
-#   3   3 1 15              11          16
-# VVV TTT I LLLLLLLLLLLLLLL AAAAAAAAAAA BBBBBBBBBBBBBBBB
 
 
 @dataclass
@@ -29,12 +13,49 @@ class Command:
     length_type: int = field(init=False, default=int)
     length: int = field(init=False, default=6)
     sub_packets_string: str = field(init=False, default=str)
-    value: int = field(init=False, default=int)
+    value: int = field(init=False, default=0)
     sub_packets: list['Command'] = field(default_factory=list, init=False)
 
     def is_literal(self):
         return self.command_type == 4
 
+    def sum(self):
+        self.value = sum([command.value for command in self.sub_packets])
+
+    def product(self):
+        self.value = prod([command.value for command in self.sub_packets])
+
+    def min(self):
+        self.value = min([command.value for command in self.sub_packets])
+
+    def max(self):
+        self.value = max([command.value for command in self.sub_packets])
+
+    def greater_than(self):
+        self.value = 1 if self.sub_packets[0].value > self.sub_packets[1].value else 0
+
+    def less_than(self):
+        self.value = 1 if self.sub_packets[0].value < self.sub_packets[1].value else 0
+
+    def equals(self):
+        self.value = 1 if self.sub_packets[0].value == self.sub_packets[1].value else 0
+
+    def perform_command_function(self):
+        if self.command_type == 0:
+            self.sum()
+        elif self.command_type == 1:
+            self.product()
+        elif self.command_type == 2:
+            self.min()
+        elif self.command_type == 3:
+            self.max()
+        elif self.command_type == 5:
+            self.greater_than()
+        elif self.command_type == 6:
+            self.less_than()
+        elif self.command_type == 7:
+            self.equals()
+    
 
 @dataclass
 class BinParser:
@@ -43,20 +64,20 @@ class BinParser:
 
     def run(self):
         while len(self.bin_string) and int(self.bin_string):
-            self.parse_command()
+            self.commands.append(self.parse_command())
 
     def parse_command(self) -> Command:
         command = Command(
                 version=self.get_version(),
                 command_type=self.get_type()
         )
-        self.commands.append(command)
 
         if command.is_literal():
             self.parse_literal_command(command)
         else:
             self.parse_operator_command(command)
-
+            
+        command.perform_command_function()
         return command
 
     def parse_literal_command(self, command: Command):
@@ -134,29 +155,45 @@ class BinParser:
         self.bin_string = self.bin_string[by:]
 
 
-def run_a(file) -> int:
-    # remove the 0b prefix
+def get_prefix_zeroes(first_char):
     prexif_zeroes = ''
 
-    # first_char = int(file[0][0], 16)
-    # if  first_char == '0':
-    #     prexif_zeroes.zfill(4)
-    # elif first_char == '1':
-    #     prexif_zeroes.zfill(3)
-    # elif first_char
+    if first_char == '0':
+        prexif_zeroes = '0000'
+    elif first_char == '1':
+        prexif_zeroes = '000'
+    elif first_char in '23':
+        prexif_zeroes = '00'
+    elif first_char in '4567':
+        prexif_zeroes = '0'
 
-    bin_string = '00' + bin(int(file[0], 16))[2:]
+    return prexif_zeroes
+
+
+def sum_versions(command: Command, version_sum: int):
+    version_sum += command.version
+    for sub_command in command.sub_packets:
+        version_sum = sum_versions(sub_command, version_sum)
+    return version_sum
+
+
+@time_function()
+def run_a(file) -> int:
+    bin_string = get_prefix_zeroes(file[0][0]) + bin(int(file[0], 16))[2:]  # remove the 0b prefix
+
     bin_parser = BinParser(bin_string)
     bin_parser.run()
 
-
-    return sum([command.version for command in bin_parser.commands])
-
+    return sum_versions(bin_parser.commands[0], 0)
 
 
-
+@time_function()
 def run_b(file):
-    pass
+    bin_string = get_prefix_zeroes(file[0][0]) + bin(int(file[0], 16))[2:]  # remove the 0b prefix
+
+    bin_parser = BinParser(bin_string)
+    bin_parser.run()
+    return bin_parser.commands[0].value
 
 
 if __name__ == '__main__':
