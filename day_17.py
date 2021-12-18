@@ -55,6 +55,7 @@ def missed_target(position, velocity, x_range_tuple, y_range_tuple):
 
 
 def project_path(velocity, x_range_tuple, y_range_tuple):
+    veloc = tuple(velocity)
     position = np.array([0, 0])
     max_y = 0
     while 1:
@@ -66,7 +67,19 @@ def project_path(velocity, x_range_tuple, y_range_tuple):
         if missed_target(position, velocity, x_range_tuple, y_range_tuple):
             return
         elif hit_target(position, x_range_tuple, y_range_tuple):
-            return max_y
+            return max_y, veloc
+
+
+def reverse_engineer(x_range_tuple, y_range_tuple):
+    coords = []
+    for x in range(x_range_tuple[0], x_range_tuple[1]):
+        for y in range(y_range_tuple[0], y_range_tuple[1]):
+            coords.append((x, y))
+    # (217, -69) -> (0, 0)
+    # (
+
+    console.print(len(coords))
+
 
 
 @time_function(1)
@@ -74,6 +87,8 @@ def run(file):
     x_range_tuple, y_range_tuple = parse_target(file)
     try_velocities = np.array(
             [start_velocity for start_velocity in itertools.product(np.arange(-250, 250, dtype=int), repeat=2)])
+
+    reverse_engineer(x_range_tuple, y_range_tuple)
 
     hits = []
     for velocity in try_velocities:

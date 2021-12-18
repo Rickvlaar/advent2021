@@ -96,8 +96,6 @@ class BinParser:
             self.parse_subs_by_packet_count(command)
 
     def parse_subs_by_length(self, command):
-        # FIXME: this count
-        bla = self.bin_string[0:16]
         total_length_of_bits_subpackets = int(self.bin_string[0:15], 2)
         command.length += 15
         self.reduce_bin_string(15)
@@ -177,7 +175,7 @@ def sum_versions(command: Command, version_sum: int):
     return version_sum
 
 
-@time_function()
+@time_function(100)
 def run_a(file) -> int:
     bin_string = get_prefix_zeroes(file[0][0]) + bin(int(file[0], 16))[2:]  # remove the 0b prefix
 
@@ -187,7 +185,7 @@ def run_a(file) -> int:
     return sum_versions(bin_parser.commands[0], 0)
 
 
-@time_function()
+@time_function(100)
 def run_b(file):
     bin_string = get_prefix_zeroes(file[0][0]) + bin(int(file[0], 16))[2:]  # remove the 0b prefix
 
