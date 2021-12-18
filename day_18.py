@@ -27,7 +27,6 @@ def snail_func(snail_1: list, snail_2: list):
         combined_snail, explosions_made = go_explode(combined_snail)
         splits_made = go_split(combined_snail)
 
-    console.print(combined_snail)
     return combined_snail
 
 
@@ -110,6 +109,12 @@ def recursive_reversed(items):
     return items
 
 
+def recursive_copy(items):
+    if isinstance(items, list):
+        return [recursive_copy(item) for item in items]
+    return items
+
+
 def explode(snail: list, explode_index: int):
     left, right = snail[explode_index]
     snail[explode_index] = BOOM
@@ -144,34 +149,9 @@ def run_a(file):
 
 @time_function()
 def run_b(file):
-    parsed_file = parse_file(file)
-
-    # combolist = []
-    # for a, b in permutations(parsed_file, 2):
-    #     combo = [a, b]
-    #     snailcombi = add_snails(combo)
-    #     console.print(snailcombi)
-    #
-    #
-    #     combolist.append(combo)
-    #     break
-    #
-    #
-    # for combo in combolist:
-    #     console.print(combo)
-
-
-    # snailcombi = add_snails()
-    # magnitude = get_magnitude(snailcombi)
-    #
-    # magnitude_list = [get_magnitude(add_snails(list(combo))) for combo in permutations(parsed_file, 2)]
-    #
-    # bla = add_snails([[[2, [[7, 7], 7]], [[5, 8], [[9, 3], [0, 2]]]], [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]])
-    # console.print(bla)
-    # console.print(get_magnitude(bla))
-    # console.print(magnitude_list)
-    # magnitude_list.sort()
-    # return magnitude_list[-1]
+    magnitude_list = [get_magnitude(snail_func(recursive_copy(combo[0]), recursive_copy(combo[1]))) for combo in permutations(parse_file(file), 2)]
+    magnitude_list.sort()
+    return magnitude_list[-1]
 
 
 if __name__ == '__main__':
@@ -180,4 +160,3 @@ if __name__ == '__main__':
 
     console.print(f'solution 18A: {answer_a}')
     console.print(f'solution 18B: {answer_b}')
-
