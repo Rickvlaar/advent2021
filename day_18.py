@@ -68,6 +68,25 @@ def go_deeper(snail: list, deepness: int = 0):
                     return outcome
 
 
+def exploder(snail: list, deepness: int = 1):
+    pair_a, pair_b = snail
+
+    if isinstance(pair_a, list):
+        if deepness >= 4:
+            int_a, int_b = pair_a
+            
+
+        pair_a = exploder(pair_a, deepness + 1)
+
+    if isinstance(pair_b, list):
+        if deepness >= 4:
+            go_boom()
+
+        pair_b = exploder(pair_b, deepness + 1)
+
+def go_boom():
+    pass
+
 def go_split(snail: list):
     for index, snail_number in enumerate(snail):
         if isinstance(snail_number, list):
