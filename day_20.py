@@ -1,9 +1,5 @@
 from util import console, parse_file_as_list, time_function
 from dataclasses import dataclass, field
-from math import dist
-from functools import reduce
-from itertools import product
-from collections import defaultdict
 import numpy as np
 
 day_file = parse_file_as_list('input/day_20.txt')
@@ -14,18 +10,6 @@ def get_algo_and_image(file: list[str]) -> (np.array, np.array):
     algo = np.array([[char == '#' for char in line] for line in file[0]], dtype=int)
     image = np.array([[char == '#' for char in line] for line in file[2:]], dtype=int)
     return algo, image
-
-
-def get_the_hood_8(grid: np.array) -> dict:
-    max_y = grid.shape[0]
-    max_x = grid.shape[1]
-    the_hood = dict()
-    for y, line in enumerate(grid):
-        for x, num in enumerate(line):
-            xs = [x_2 for x_2 in range(x - 1, x + 2) if 0 <= x_2 < max_x]
-            ys = [y_2 for y_2 in range(y - 1, y + 2) if 0 <= y_2 < max_y]
-            the_hood[(y, x)] = [coord for coord in product(ys, xs)]
-    return the_hood
 
 
 @dataclass

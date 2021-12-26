@@ -23,8 +23,8 @@ class Scanner:
 class BeaconMatch:
     coord_1: np.array
     coord_2: np.array
-    scanner_1: Scanner
-    scanner_2: Scanner
+    # scanner_1: Scanner
+    # scanner_2: Scanner
     match_val: set[float]
 
 
@@ -105,8 +105,8 @@ def match_scanner_coords(scanner_1: Scanner, scanner_2: Scanner):
 
                 scanner_1.beacon_matches[scanner_2.number].append(BeaconMatch(np.array(beacon),
                                                                               np.array(other_beacon),
-                                                                              scanner_1,
-                                                                              scanner_2,
+                                                                              # scanner_1,
+                                                                              # scanner_2,
                                                                               overlap))
 
 
@@ -135,11 +135,19 @@ def determine_orientation(matches: list[BeaconMatch], plane_angles: tuple = (0, 
         orientation = match.coord_2
 
         # mismatched orientation
-        if relative_position and relative_position != reference - orientation:
+        if not np.array_equal(relative_position, reference - orientation):
+            change_orientation(matches)
             return determine_orientation(matches)
 
     # if they stay the same, orientation is good
+    console.print('goood!')
     return plane_angles
+
+
+def change_orientation(matches: list[BeaconMatch]):
+    for match in matches:
+        match.coord_2 = rotate_x(match.coord_2)
+        match.coord_2 = rotate_z(match.coord_2)
 
 
 
@@ -202,8 +210,8 @@ def create_map_from_matches(matches: list[BeaconMatch]):
 
 @time_function()
 def run_a(file):
-    # scanner_dict = parse_file(file)
-    # scanner_dict = get_scanner_coord_maps(scanner_dict)
+    scanner_dict = parse_file(file)
+    scanner_dict = get_scanner_coord_maps(scanner_dict)
 
     x = np.array([-618, -824, -621])
     y = np.array([686, 422, 578])
