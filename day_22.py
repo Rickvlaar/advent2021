@@ -1,10 +1,6 @@
 from util import console, parse_file_as_list, time_function
 from dataclasses import dataclass, field
 import plotly.graph_objects as go
-from random import randint
-
-from itertools import product, combinations, permutations
-import numpy as np
 
 day_file = parse_file_as_list('input/day_22.txt')
 test_file = parse_file_as_list('input/day_22_test.txt')
@@ -19,9 +15,6 @@ class Cuboid:
     x: list = field(init=False)
     y: list = field(init=False)
     z: list = field(init=False)
-    on_count: int = field(init=False, default=0)
-    overlap_cuboids: list = field(default_factory=list)
-    overlap_dict: dict = field(default_factory=dict)
     shape: go.Isosurface = field(init=False)
 
     def get_volume(self) -> int:
@@ -46,29 +39,6 @@ class Cuboid:
                      z_min >= self.z_range_tuple[0] and z_min <= self.z_range_tuple[1]
 
         return x_overlaps and y_overlaps and z_overlaps
-
-    def get_overlap_size(self, cuboid: 'Cuboid'):
-        x_overlap = self.get_range_overlap_size(cuboid.x_range_tuple, self.x_range_tuple)
-        y_overlap = self.get_range_overlap_size(cuboid.y_range_tuple, self.y_range_tuple)
-        z_overlap = self.get_range_overlap_size(cuboid.z_range_tuple, self.z_range_tuple)
-        return x_overlap * y_overlap * z_overlap
-
-    def get_range_overlap_size(self, own_range, their_range):
-        min, max = their_range
-        overlap = 0
-        # -50 -> 50 :: 20 - 30
-        if min >= own_range[0] and max <= own_range[1]:
-            overlap = max - min
-        # -50 -> 50 :: 20 - 60
-        elif min >= own_range[0] and max >= own_range[1]:
-            overlap = own_range[1] - min
-        # -50 -> 50 :: -100 -> 30
-        elif min < own_range[0] and max <= own_range[1]:
-            overlap = max - own_range[0]
-        # -50 -> 50 :: -100 -> 100
-        elif min < own_range[0] and max >= own_range[1]:
-            overlap = own_range[1] - own_range[0]
-        return overlap
 
     def get_overlap_range(self, own_range, their_range):
         min, max = their_range
@@ -165,13 +135,6 @@ class Cuboid:
         return nested_x and nested_y and nested_z
 
 
-def turn(self, cuboid: 'Cuboid'):
-    for x in range(cuboid.x_range_tuple[0], cuboid.x_range_tuple[1] + 1):
-        for y in range(cuboid.y_range_tuple[0], cuboid.y_range_tuple[1] + 1):
-            for z in range(cuboid.z_range_tuple[0], cuboid.z_range_tuple[1] + 1):
-                self.overlap_dict[(x, y, z)] = cuboid.action
-
-
 def parse_target(file: list[str]):
     cuboids = []
     for line in file:
@@ -191,21 +154,22 @@ def parse_target(file: list[str]):
     return cuboids
 
 
-def turn_m_on(cubs: list[Cuboid], target_cuboid: Cuboid):
+def turn_m_on(cubs: list[Cuboid], render: False):
     new_cubs = []
     while cubs:
         fresh_cub = cubs.pop(0)
         new_cubs = check_cube_overlap(fresh_cub, new_cubs)
 
-
     on_count = 0
     for cub in new_cubs:
-        cub.three_d()
         on_count += cub.get_volume()
+        if render:
+            cub.three_d()
 
-    data = [cub.shape for cub in new_cubs]
-    fig = go.Figure(data=data)
-    fig.show()
+    if render:
+        data = [cub.shape for cub in new_cubs]
+        fig = go.Figure(data=data)
+        fig.show()
 
     return on_count
 
@@ -233,25 +197,19 @@ def check_cube_overlap(fresh_cube: Cuboid, existing_cubes: list[Cuboid]):
 
 @time_function()
 def run_a(file):
-    cubs = parse_target(file)
-    target_cuboid = Cuboid(0, (-50, 50), (-50, 50), (-50, 50))
-    return turn_m_on(cubs, target_cuboid)
+    cubs = parse_target(file[:20])
+    return turn_m_on(cubs, False)
 
 
 @time_function()
 def run_b(file):
-    pass
+    cubs = parse_target(file)
+    return turn_m_on(cubs, False)
 
 
 if __name__ == '__main__':
-    answer_a = run_a(test_file)
+    answer_a = run_a(day_file)
     answer_b = run_b(day_file)
-
-    correct = 2758514936282235
-    if answer_a != correct:
-        console.print(f'Off by just {answer_a - correct}')
-    else:
-        console.print('CORRECTO!!!')
 
     console.print(f'solution 22A: {answer_a}')
     console.print(f'solution 22B: {answer_b}')
