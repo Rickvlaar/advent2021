@@ -24,10 +24,10 @@ class Cuboid:
     overlap_dict: dict = field(default_factory=dict)
     shape: go.Isosurface = field(init=False)
 
-    def get_size(self) -> int:
-        x_size = self.x_range_tuple[1] - self.x_range_tuple[0]
-        y_size = self.y_range_tuple[1] - self.y_range_tuple[0]
-        z_size = self.z_range_tuple[1] - self.z_range_tuple[0]
+    def get_volume(self) -> int:
+        x_size = abs(self.x_range_tuple[1] - self.x_range_tuple[0]) + 1
+        y_size = abs(self.y_range_tuple[1] - self.y_range_tuple[0]) + 1
+        z_size = abs(self.z_range_tuple[1] - self.z_range_tuple[0]) + 1
         return x_size * y_size * z_size
 
     def overlaps(self, cuboid: 'Cuboid'):
@@ -36,14 +36,14 @@ class Cuboid:
         z_min, z_max = cuboid.z_range_tuple
 
         # -44 -> 5 :: -5 -> 47
-        x_overlaps = x_min <= self.x_range_tuple[0] and x_max > self.x_range_tuple[0] or \
-                     x_min >= self.x_range_tuple[0] and x_min < self.x_range_tuple[1]
+        x_overlaps = x_min <= self.x_range_tuple[0] and x_max >= self.x_range_tuple[0] or \
+                     x_min >= self.x_range_tuple[0] and x_min <= self.x_range_tuple[1]
 
-        y_overlaps = y_min <= self.y_range_tuple[0] and y_max > self.y_range_tuple[0] or \
-                     y_min >= self.y_range_tuple[0] and y_min < self.y_range_tuple[1]
+        y_overlaps = y_min <= self.y_range_tuple[0] and y_max >= self.y_range_tuple[0] or \
+                     y_min >= self.y_range_tuple[0] and y_min <= self.y_range_tuple[1]
 
-        z_overlaps = z_min <= self.z_range_tuple[0] and z_max > self.z_range_tuple[0] or \
-                     z_min >= self.z_range_tuple[0] and z_min < self.z_range_tuple[1]
+        z_overlaps = z_min <= self.z_range_tuple[0] and z_max >= self.z_range_tuple[0] or \
+                     z_min >= self.z_range_tuple[0] and z_min <= self.z_range_tuple[1]
 
         return x_overlaps and y_overlaps and z_overlaps
 
@@ -112,8 +112,8 @@ class Cuboid:
                 y=self.y,
                 z=self.z,
                 value=[self.action for _ in range(len(self.x))],
-                opacity=0.7,
-                isomin=1)
+                opacity=1,
+                isomin=0)
 
     def split_cuboid(self, overlap: 'Cuboid'):
         splits = []
@@ -121,22 +121,22 @@ class Cuboid:
         z_min, z_max = self.z_range_tuple
         # Only create new cuboid is dimension does not dissapear in other cube
         if z_min < overlap.z_range_tuple[0] or z_max > overlap.z_range_tuple[1]:
-            z_min = overlap.z_range_tuple[1] if overlap.z_range_tuple[1] < z_max else z_min
-            z_max = overlap.z_range_tuple[0] if overlap.z_range_tuple[0] > z_min else z_max
+            z_min = overlap.z_range_tuple[1] + 1 if overlap.z_range_tuple[1] < z_max else z_min
+            z_max = overlap.z_range_tuple[0] - 1 if overlap.z_range_tuple[0] > z_min else z_max
             cub_z = Cuboid(1, overlap.x_range_tuple, overlap.y_range_tuple, (z_min, z_max))
             splits.append(cub_z)
 
         x_min, x_max = self.x_range_tuple
         if x_min < overlap.x_range_tuple[0] or x_max > overlap.x_range_tuple[1]:
-            x_min = overlap.x_range_tuple[1] if overlap.x_range_tuple[1] < x_max else x_min
-            x_max = overlap.x_range_tuple[0] if overlap.x_range_tuple[0] > x_min else x_max
+            x_min = overlap.x_range_tuple[1] + 1 if overlap.x_range_tuple[1] < x_max else x_min
+            x_max = overlap.x_range_tuple[0] - 1 if overlap.x_range_tuple[0] > x_min else x_max
             cub_x = Cuboid(1, (x_min, x_max), overlap.y_range_tuple, self.z_range_tuple)
             splits.append(cub_x)
 
         y_min, y_max = self.y_range_tuple
         if y_min < overlap.y_range_tuple[0] or y_max > overlap.y_range_tuple[1]:
-            y_min = overlap.y_range_tuple[1] if overlap.y_range_tuple[1] < y_max else y_min
-            y_max = overlap.y_range_tuple[0] if overlap.y_range_tuple[0] > y_min else y_max
+            y_min = overlap.y_range_tuple[1] + 1 if overlap.y_range_tuple[1] < y_max else y_min
+            y_max = overlap.y_range_tuple[0] - 1 if overlap.y_range_tuple[0] > y_min else y_max
             cub_y = Cuboid(1, self.x_range_tuple, (y_min, y_max), self.z_range_tuple)
             splits.append(cub_y)
 
@@ -153,14 +153,14 @@ class Cuboid:
 
         return outer_cubs + inner_cubs
 
-    def is_nested_overlap(self, cuboid: 'Cuboid'):
-        x_min, x_max = cuboid.x_range_tuple
-        y_min, y_max = cuboid.y_range_tuple
-        z_min, z_max = cuboid.z_range_tuple
+    def is_nested_in(self, cuboid: 'Cuboid'):
+        x_min, x_max = self.x_range_tuple
+        y_min, y_max = self.y_range_tuple
+        z_min, z_max = self.z_range_tuple
 
-        nested_x = x_min > self.x_range_tuple[0] and x_max < self.x_range_tuple[1]
-        nested_y = y_min > self.y_range_tuple[0] and y_max < self.y_range_tuple[1]
-        nested_z = z_min > self.z_range_tuple[0] and z_max < self.z_range_tuple[1]
+        nested_x = x_min >= cuboid.x_range_tuple[0] and x_max <= cuboid.x_range_tuple[1]
+        nested_y = y_min >= cuboid.y_range_tuple[0] and y_max <= cuboid.y_range_tuple[1]
+        nested_z = z_min >= cuboid.z_range_tuple[0] and z_max <= cuboid.z_range_tuple[1]
 
         return nested_x and nested_y and nested_z
 
@@ -192,51 +192,43 @@ def parse_target(file: list[str]):
 
 
 def turn_m_on(cubs: list[Cuboid], target_cuboid: Cuboid):
-    target_cuboid.three_d()
-
-    target_cuboid = cubs.pop(0)
-    target_cuboid.three_d()
-    new_cubs = [target_cuboid]
-    counter = 0
-    console.print(target_cuboid.get_size())
+    new_cubs = []
     while cubs:
         fresh_cub = cubs.pop(0)
-        console.print(fresh_cub.get_size())
+        new_cubs = check_cube_overlap(fresh_cub, new_cubs)
 
-        new_sub_cubs = []
-        for cuboid in new_cubs:
-            if cuboid.overlaps(fresh_cub):
-                overlap_cuboid = fresh_cub.get_overlap_cuboid(cuboid)
-                new_sub_cubs.extend(fresh_cub.split_cuboid(overlap_cuboid))
-            #
-            elif cuboid.action:
-                new_sub_cubs.append(fresh_cub)
 
-        new_cubs.extend(new_sub_cubs)
-
-        counter += 1
-        if counter == 2:
-            break
-
-    noper_coiunt  = 0
+    on_count = 0
     for cub in new_cubs:
         cub.three_d()
-        noper_coiunt += cub.get_size()
-
-    console.print(noper_coiunt)
-    # 21047515516170
-    # 2758514936282235
-
-        # for othercub in new_cubs:
-        #     if cub.overlaps(othercub):
-        #         noper_coiunt += 1
-        #         console.print('noper', noper_coiunt)
+        on_count += cub.get_volume()
 
     data = [cub.shape for cub in new_cubs]
     fig = go.Figure(data=data)
     fig.show()
 
-    return
+    return on_count
+
+
+def check_cube_overlap(fresh_cube: Cuboid, existing_cubes: list[Cuboid]):
+    new_existing_cubes = []
+    for cuboid in existing_cubes:
+        if cuboid.overlaps(fresh_cube):
+            if cuboid.is_nested_in(fresh_cube) and cuboid.action:
+                # Destroy the cuboid by skipping it
+                continue
+            else:
+                overlap_cuboid = cuboid.get_overlap_cuboid(fresh_cube)
+                splits = cuboid.split_nested_cuboid(overlap_cuboid)
+                new_existing_cubes.extend(splits)
+
+        # if no overlap and activation cube, just place the cube, otherwise ignore missed turn-off
+        elif cuboid.action:
+            new_existing_cubes.append(cuboid)
+
+    if fresh_cube.action:
+        new_existing_cubes.append(fresh_cube)
+    return new_existing_cubes
 
 
 @time_function()
@@ -253,7 +245,13 @@ def run_b(file):
 
 if __name__ == '__main__':
     answer_a = run_a(test_file)
-    answer_b = run_b(test_file)
+    answer_b = run_b(day_file)
+
+    correct = 2758514936282235
+    if answer_a != correct:
+        console.print(f'Off by just {answer_a - correct}')
+    else:
+        console.print('CORRECTO!!!')
 
     console.print(f'solution 22A: {answer_a}')
     console.print(f'solution 22B: {answer_b}')
