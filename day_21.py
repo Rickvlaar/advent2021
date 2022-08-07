@@ -62,14 +62,20 @@ throw_values = [sum(throw) for throw in all_possible_throws]
 throw_value_frequency = Counter(throw_values)  # ranges from 3-9
 
 
-def play_dirac():
+def play_dirac(players: list[Player]):
     first_turn = Turn(throw=0,
                       one_score=0,
-                      one_pos=3,
+                      one_pos=players[0].position,
                       two_score=0,
-                      two_pos=4)
+                      two_pos=players[1].position)
 
-    play_rounds(turn=first_turn, who_turn=1, universes_created=1)
+    # play_rounds(turn=first_turn, who_turn=1, universes_created=1)
+    play_rounds_2(one_pos=first_turn.one_pos,
+                  one_score=first_turn.one_score,
+                  two_pos=first_turn.two_pos,
+                  two_score=first_turn.two_score,
+                  who_turn=1,
+                  universes_created=1)
 
     console.print(
             f'games finished: {won_games_1 + won_games_2:,}, player 1: {universes_won_1:,}, player 2: {universes_won_2:,}')
@@ -98,6 +104,53 @@ def play_rounds(turn: Turn, who_turn: int, universes_created: int) -> None:
         else:
             new_who_turn = 2 if who_turn == 1 else 1
             play_rounds(turn=new_turn, who_turn=new_who_turn, universes_created=new_universes_created)
+
+
+def play_rounds_2(one_pos: int, one_score: int, two_pos: int, two_score: int, who_turn: int,
+                  universes_created: int) -> None:
+
+    for throw in range(3, 10):
+        new_universes_created = universes_created * throw_value_frequency[throw]
+
+        if who_turn == 1:
+            new_score, new_pos = do_turn_2(pos=one_pos, score=one_score, throw_value=throw)
+        else:
+            new_score, new_pos = do_turn_2(pos=two_pos, score=two_score, throw_value=throw)
+
+        if new_score >= 21:
+            if who_turn == 1:
+                global universes_won_1
+                universes_won_1 += new_universes_created
+            else:
+                global universes_won_2
+                universes_won_2 += new_universes_created
+        else:
+            new_who_turn = 2 if who_turn == 1 else 1
+            if who_turn == 1:
+                play_rounds_2(one_pos=new_pos,
+                              one_score=new_score,
+                              two_pos=two_pos,
+                              two_score=two_score,
+                              who_turn=new_who_turn,
+                              universes_created=new_universes_created)
+            else:
+                play_rounds_2(one_pos=one_pos,
+                              one_score=one_score,
+                              two_pos=new_pos,
+                              two_score=new_score,
+                              who_turn=new_who_turn,
+                              universes_created=new_universes_created)
+
+
+def do_turn_2(pos: int, score: int, throw_value: int) -> (int, int):
+    new_pos = (pos + throw_value) % 10
+    if not new_pos:
+        new_pos = 10
+
+    pos = new_pos
+    score += pos
+
+    return score, pos
 
 
 def do_turn(turn: Turn, throw_value: int, who_turn: int) -> bool:
@@ -144,12 +197,13 @@ def run_a(file):
 
 @time_function()
 def run_b(file):
-    return play_dirac()
+    players = parse_file(file)
+    return play_dirac(players)
 
 
 if __name__ == '__main__':
     answer_a = run_a(day_file)
-    answer_b = run_b(test_file)
+    answer_b = run_b(day_file)
 
     console.print(f'solution 21A: {answer_a}')
     console.print(f'solution 21B: {answer_b}')
